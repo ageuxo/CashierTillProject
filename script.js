@@ -42,6 +42,9 @@ const noChangeDueMsg = "No change due - customer paid with exact cash";
 
 var processClick = (cash, price, cid, testing = false) => {
   const changeDue = getChange(cash, price)
+  if (changeDue == null) {
+    return;
+  }
   const drawerValue = cid.reduce((acc, entry)=>acc+entry[1], 0)
   //console.log(`change: ${changeDue}, drawerValue: ${drawerValue.toFixed(2)}, CiD: [${cid}]`)
   if (changeDue == 0) {
