@@ -83,25 +83,38 @@ const getChange = (cash, price)=>{
   }
 }
 
-const calcToReturn = (changeDue, cid)=>{
-  const orderedDrawer = cid.reverse();
+const calcToReturn = (changeDue, cid) => {
+  const orderedDrawer = [...cid].reverse(); // Reverse a copy of cid to avoid modifying the original array
   const toReturn = [];
+  let remainingChange = changeDue;
 
-  for (let index = 0;index < orderedCurrency.length; index++) {
-    const entry = orderedDrawer[index];
-    if (changeDue >= orderedCurrency[index][1] && orderedDrawer[index][1] >= orderedCurrency[index][1]) {
-      const currAmount = Math.floor(changeDue / orderedCurrency[index][1]);
-      const deducted = orderedCurrency[index][1] * currAmount;
-      changeDue -= deducted;
-      toReturn.push(` ${orderedCurrency[index][0]}: $${parseFloat(deducted.toFixed(orderedCurrency[index][2]))}`)
+  for (let index = 0; index < orderedCurrency.length; index++) {
+    const [currencyName, currencyValue, decimals] = orderedCurrency[index];
+    const [drawerCurrencyName, drawerAmount] = orderedDrawer[index];
+    let amountFromDrawer = 0;
+
+    if (currencyValue <= remainingChange && drawerAmount > 0) {
+      const maxCurrencyCount = Math.floor(drawerAmount / currencyValue);
+      const requiredCurrencyCount = Math.floor(remainingChange / currencyValue);
+      const currencyCount = Math.min(maxCurrencyCount, requiredCurrencyCount);
+
+      amountFromDrawer = currencyCount * currencyValue;
+      remainingChange = (remainingChange - amountFromDrawer).toFixed(2); // To avoid floating point precision issues
+
+      if (amountFromDrawer > 0) {
+        toReturn.push(` ${currencyName}: $${parseFloat(amountFromDrawer.toFixed(decimals))}`);
+      }
     }
   }
-  if (changeDue >= 0.01) {
+
+  // If we can't provide the exact change, return an error state
+  if (remainingChange > 0) {
     updateResult(changeStates[0]);
-    return;
+    return null;
   }
+
   return toReturn;
-}
+};
 
 purchaseBtn.addEventListener("click", ()=>{
   processClick(cashInput.value, price, cid)
