@@ -40,8 +40,7 @@ const purchaseBtn = document.getElementById("purchase-btn");
 const notEnoughMsg = "Customer does not have enough money to purchase the item";
 const noChangeDueMsg = "No change due - customer paid with exact cash";
 
-const processClick = () => {
-  let cash = cashInput.value;
+var processClick = (cash, price, cid, testing = false) => {
   const changeDue = getChange(cash, price)
   const drawerValue = cid.reduce((acc, entry)=>acc+entry[1], 0)
   //console.log(`change: ${changeDue}, drawerValue: ${drawerValue.toFixed(2)}, CiD: [${cid}]`)
@@ -56,14 +55,16 @@ const processClick = () => {
       updateResult(changeStates[2]);
     }
     //calculate bills n coins
-    const toReturn = calcToReturn(changeDue);
+    const toReturn = calcToReturn(changeDue, cid);
     if (toReturn) {
       toReturn.forEach((e)=>{
         changeEl.innerText += e;
       })
     }
   }
-  console.log(changeEl.innerText);
+  if (testing) {
+    return changeEl.innerText;
+  }
 }
 
 const updateResult = (state)=>{
@@ -79,7 +80,7 @@ const getChange = (cash, price)=>{
   }
 }
 
-const calcToReturn = (changeDue)=>{
+const calcToReturn = (changeDue, cid)=>{
   const orderedDrawer = cid.reverse();
   const toReturn = [];
 
@@ -89,7 +90,7 @@ const calcToReturn = (changeDue)=>{
       const currAmount = Math.floor(changeDue / orderedCurrency[index][1]);
       const deducted = orderedCurrency[index][1] * currAmount;
       changeDue -= deducted;
-      toReturn.push(` ${orderedCurrency[index][0]}: $${deducted.toFixed(orderedCurrency[index][2])}`)
+      toReturn.push(` ${orderedCurrency[index][0]}: $${parseFloat(deducted.toFixed(orderedCurrency[index][2]))}`)
     }
   }
   if (changeDue >= 0.01) {
@@ -99,4 +100,6 @@ const calcToReturn = (changeDue)=>{
   return toReturn;
 }
 
-purchaseBtn.addEventListener("click", processClick);
+purchaseBtn.addEventListener("click", ()=>{
+  processClick(cashInput.value, price, cid)
+});
