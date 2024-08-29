@@ -45,9 +45,9 @@ const testStates = [
   },
   {
     price: 19.5,
-    cash: 20,
-    cid: [["PENNY", 0.5], ["NICKEL", 0], ["DIME", 0], ["QUARTER", 0], ["ONE", 0], ["FIVE", 0], ["TEN", 0], ["TWENTY", 0], ["ONE HUNDRED", 0]],
-    result: "Status: CLOSED PENNY: $0.5"
+    cash: 190,
+    cid: [["PENNY", 0.1], ["NICKEL", 0.05], ["DIME", 0.1], ["QUARTER", 0.25], ["ONE", 5], ["FIVE", 5], ["TEN", 0], ["TWENTY", 60], ["ONE HUNDRED", 100]],
+    result: "Status: CLOSED HUNDRED: $100 TWENTY: $60 FIVE: $5 ONE: $5 QUARTER: $0.25 DIME: $0.1 NICKEL: $0.05 PENNY: $0.1"
   }
 ]
 
