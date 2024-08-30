@@ -83,36 +83,29 @@ const getChange = (cash, price)=>{
   }
 }
 
-const calcToReturn = (changeDue, cid) => {
-  const orderedDrawer = [...cid].reverse(); // Reverse a copy of cid to avoid modifying the original array
+// new and improved, my own code upgraded(by me) with ChatGPT tips and tricks!
+const calcToReturn = (changeDue, cid)=>{
+  const orderedDrawer = cid.reverse();
   const toReturn = [];
-  let remainingChange = changeDue;
 
-  for (let index = 0; index < orderedCurrency.length; index++) {
-    const [currencyName, currencyValue, decimals] = orderedCurrency[index];
-    const [drawerCurrencyName, drawerAmount] = orderedDrawer[index];
-    let amountFromDrawer = 0;
-
-    if (currencyValue <= remainingChange && drawerAmount > 0) {
-      const maxCurrencyCount = Math.floor(drawerAmount / currencyValue);
-      const requiredCurrencyCount = Math.floor(remainingChange / currencyValue);
-      const currencyCount = Math.min(maxCurrencyCount, requiredCurrencyCount);
-
-      amountFromDrawer = currencyCount * currencyValue;
-      remainingChange = (remainingChange - amountFromDrawer).toFixed(2); // To avoid floating point precision issues
-
-      if (amountFromDrawer > 0) {
-        toReturn.push(` ${currencyName}: $${parseFloat(amountFromDrawer.toFixed(decimals))}`);
+  for (let index = 0;index < orderedCurrency.length; index++) {
+    const [drawName, drawAmount] = orderedDrawer[index]; // array destructuring
+    const [currName, currValue] = orderedCurrency[index];
+    if (changeDue >= currValue && drawAmount >= currValue) {
+      const currAmount = Math.floor(changeDue / currValue);
+      const maxCurrAmount = Math.floor(drawAmount / currValue);
+      const deducted = Math.min(currValue * currAmount, currValue * maxCurrAmount); // 
+      changeDue = parseFloat((changeDue - deducted).toFixed(2)); // make sure there aren't any float shenanigans
+      toReturn.push(` ${currName}: $${parseFloat(deducted.toFixed(2))}`)
+      if (changeDue == 0) { // no need to keep iterating
+        return toReturn;
       }
     }
   }
-
-  // If we can't provide the exact change, return an error state
-  if (remainingChange > 0) {
+  if (changeDue > 0) { // if for loop exited with more than $0 we can't give change
     updateResult(changeStates[0]);
-    return null;
+    return;
   }
-
   return toReturn;
 };
 
